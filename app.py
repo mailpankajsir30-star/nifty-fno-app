@@ -221,6 +221,7 @@ for i in range(-5, 6):
 
     dynamic_vol = round(35.2 + (sec_tick * 0.15) - (i * 0.8), 1)
     dynamic_chg_vol = round(40.1 + (sec_tick * 0.2), 1)
+    
     if i == 0:
         strike_label = f"<span class='txt-yellow'> ATM {strike_num}</span>"
         ce_phase = f"<span class='txt-green'>⚠️ SMART MONEY ACTIVE<br>Long Build-up</span><br>{current_time_ist}"
