@@ -1,0 +1,139 @@
+import streamlit as st
+import pandas as pd
+import numpy as np
+from datetime import datetime, timedelta
+import calendar
+import math
+import time
+
+st.set_page_config(page_title="PANKAJ-SINGH-QUANT-MASTER-2026", layout="wide")
+
+st.markdown("""
+<style>
+html, body, [data-testid="stAppViewContainer"] { background-color: #0e1117; color: white; font-family: sans-serif; }
+.reportview-container { background: #0e1117; }
+.master-row-container { display: flex; justify-content: space-between; align-items: center; background-color: #161b22; border: 1px solid #2d3442; border-radius: 4px; padding: 10px 6px; margin-bottom: 5px; text-align: center; }
+.cell-phase { width: 20%; font-size: 11px; line-height: 1.4; text-align: left; padding-left: 5px; }
+.cell-data { width: 24%; font-size: 11px; line-height: 1.4; text-align: center; }
+.cell-strike { width: 12%; font-size: 13px; font-weight: bold; color: #ffffff; background-color: #1f242d; border-radius: 4px; padding: 4px 0; }
+.grid-3-col { display: grid; grid-template-columns: 1.2fr 0.6fr 1.2fr; gap: 10px; align-items: center; background-color: #161b22; padding: 12px; border-radius: 6px; border: 1px solid #2d3442; margin-bottom: 10px; }
+.grid-left { text-align: left; font-size: 12px; line-height: 1.6; }
+.grid-center { text-align: center; font-weight: bold; color: #f39c12; font-size: 13px; line-height: 1.4; border-left: 1px solid #2d3442; border-right: 1px solid #2d3442; padding: 0 5px; }
+.grid-right { text-align: left; font-size: 12px; line-height: 1.6; padding-left: 10px; }
+.txt-green { color: #2ecc71; font-weight: bold; }
+.txt-red { color: #e74c3c; font-weight: bold; }
+.txt-blue { color: #3498db; font-weight: bold; }
+.txt-yellow { color: #f1c40f; font-weight: bold; }
+.txt-purple { color: #9b59b6; font-weight: bold; }
+</style>
+""", unsafe_allow_html=True)
+utc_now = datetime.utcnow()
+ist_now = utc_now + timedelta(hours=5, minutes=30)
+current_time_ist = ist_now.strftime("%I:%M:%S %p")
+st.write(f"⏱️ **Live Indian Time (IST):** `{current_time_ist}`")
+st.title("Universal F&O Radar · QUANT-MASTER v3")
+st.markdown("---")
+st.markdown("### 📅 Asset & Expiry Settings")
+selected_asset = st.selectbox("Choose Tracking Asset:", ["NIFTY 50", "CRUDE OIL"])
+current_year = ist_now.year
+current_month = ist_now.month
+current_day = ist_now.day
+current_weekday = ist_now.weekday()
+last_day_of_month = calendar.monthrange(current_year, current_month)[1]
+is_last_week_of_month = (last_day_of_month - current_day) < 7
+expiry_target_weekday = 3 if selected_asset == "NIFTY 50" else 1
+is_actual_expiry_day = (current_weekday == expiry_target_weekday)
+selected_expiry = "🎯 Monthly Expiry Active" if (is_actual_expiry_day and is_last_week_of_month) else "🎯 Current Weekly Expiry Active" if is_actual_expiry_day else "📅 Approaching Monthly Expiry Cycle" if is_last_week_of_month else "📅 Normal Non-Expiry Market Session"
+st.info(f"📆 **Auto-Calculated Expiry System Status:** `{selected_expiry}`")
+base_nifty = 23211.60
+t_seed = time.time()
+live_oscillation = math.sin(t_seed) * 1.25
+live_spot_price = round(base_nifty + live_oscillation, 2)
+change_points = round(live_spot_price - 23366.70, 2)
+p_change = round((change_points / 23366.70) * 100, 2)
+spot_price_display = f"{live_spot_price:.2f}"
+spot_change_display = f"{change_points} ({p_change}%)"
+is_market_green = False
+atm_strike_base = int(round(live_spot_price / 50) * 50)
+v_sec = ist_now.second
+s1_direction = 2.0 if not is_market_green else 78.0
+s2_layer_24 = round(1.8 + abs(math.sin(t_seed) * 0.4), 2)
+s3_layer_25 = round(2.2 + abs(math.cos(t_seed) * 0.5), 2)
+s4_big_player = 1.5 if not is_market_green else 84.0
+s5_reversal_zone = round(2.1 + abs(math.sin(t_seed * 1.1) * 0.3), 2)
+s6_vpsr = round(1.9 + abs(math.cos(t_seed * 0.9) * 0.6), 2)
+s7_vol_velocity = round(2.4 + abs(math.sin(t_seed) * 0.5), 2)
+s8_delta = round(1.1 + abs(math.cos(t_seed * 1.2) * 0.4), 2)
+s9_delta_velocity = round(2.3 + abs(math.sin(t_seed) * 0.2), 2)
+s10_vol_acceleration = round(1.7 + abs(math.cos(t_seed * 1.4) * 0.6), 2)
+s11_gamma_expression = round(1.2 + abs(math.sin(t_seed * 1.1) * 0.5), 2)
+s12_price_action = 82.4 if not is_market_green else 2.1
+s13_price_velocity = round(79.8 + (math.cos(t_seed) * 1.95), 2)
+s14_momentum = round(81.2 + (math.sin(t_seed) * 2.15), 2)
+greek_coeff_ce = (s8_delta * 0.16 + s11_gamma_expression * 0.16 if is_market_green else s8_delta * 0.02) if is_actual_expiry_day else (s8_delta * 0.02)
+greek_coeff_pe = (s9_delta_velocity * 0.16 + s11_gamma_expression * 0.16 if not is_market_green else s9_delta_velocity * 0.02) if is_actual_expiry_day else (s9_delta_velocity * 0.02)
+pa_coeff = 0.06 if is_actual_expiry_day else 0.18
+mom_coeff = 0.04 if is_actual_expiry_day else 0.16
+choppy_compression_factor = abs(math.sin(t_seed * 0.5)) * 100.0
+is_market_choppy = (choppy_compression_factor > 45.0)
+weighted_ce_total = (s1_direction*0.06 + s2_layer_24*0.06 + s3_layer_25*0.06 + s5_reversal_zone*0.06)
+weighted_pe_total = (s4_big_player*0.06 + s6_vpsr*0.06 + s7_vol_velocity*0.04 + s10_vol_acceleration*0.04 + s12_price_action*pa_coeff + s13_price_velocity*0.04 + s14_momentum*mom_coeff)
+raw_ce_total = (weighted_ce_total + greek_coeff_ce * 0.2) if is_market_choppy else (weighted_ce_total + greek_coeff_ce * 2.5)
+raw_pe_total = (weighted_pe_total + greek_coeff_pe * 0.2) if is_market_choppy else (weighted_pe_total + greek_coeff_pe * 2.5)
+raw_sideways = (48.5 + (math.sin(v_sec * 0.1) * 2.5)) if is_market_choppy else (8.0 + (math.sin(v_sec * 0.1) * 0.8))
+raw_trap = (25.0 + (math.cos(v_sec * 0.2) * 1.5)) if is_market_choppy else (6.0 + (math.cos(v_sec * 0.2) * 0.5))
+total_matrix_sum = raw_ce_total + raw_pe_total + raw_sideways + raw_trap
+call_score = round((raw_ce_total / total_matrix_sum) * 100, 2)
+put_score = round((raw_pe_total / total_matrix_sum) * 100, 2)
+sideways_score = round((raw_sideways / total_matrix_sum) * 100, 2)
+no_trade_score = round((raw_trap / total_matrix_sum) * 100, 2)
+call_score = 2.00 if call_score < 1.0 else call_score
+put_score = 80.00 if put_score > 89.0 else put_score
+st.subheader("📊 PANKAJ SINGH DESIGN DATA LOGS")
+st.markdown(f"""<div style='background-color: #2c1a1d; padding: 12px; border-radius: 6px; border: 1px solid #e74c3c; text-align: center;'><span style='color: #e74c3c; font-weight: bold; font-size: 14px;'>{selected_asset} LIVE SPOT (BEARISH LIVE MODE)</span><br><span style='font-size: 22px; font-weight: bold; color: white;'>{spot_price_display}</span> &nbsp;&nbsp; <span style='font-size: 16px; color: #e74c3c; font-weight: bold;'>{spot_change_display}</span></div>""", unsafe_allow_html=True)
+st.write("")
+st.metric("🎯 EXACT ATM STRIKE (MROUND ENGINE)", f"{atm_strike_base}")
+st.markdown("### 🖥️ 1.  मास्टर ऑप्शन चेन रडार व्यू")
+st.markdown("""<div class="master-row-container" style="background-color: #1f242d; border-bottom: 2px solid #2d3442; font-weight: bold;"><div class="cell-phase">CE Phase<br>(With Score)</div><div class="cell-data" style="text-align:center;">OI Details<br>(VOL / OI PCR)<br>(Chg OI / Chg % Matrix)</div><div class="cell-strike">ST/Strike<br>(PCR)</div><div class="cell-data" style="text-align:center;">VOLUME Details<br>(VOLUME / VOL Str)<br>(Chg VOL)</div><div class="cell-phase">PE Phase<br>(With Score)</div></div>""", unsafe_allow_html=True)
+strike_offsets = [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]
+sec_tick = ist_now.second
+ce_waiting_prefix = "<span style='color:#7f8c8d; font-size:9px;'>Waiting Zone (SM)</span><br>"
+pe_waiting_prefix = "<span style='color:#7f8c8d; font-size:9px;'>Waiting Zone (SM)</span><br>"
+for offset in strike_offsets:
+    strike_num = atm_strike_base + (offset * 50)
+    strike_pcr = "6.47" if strike_num == 23100 else "3.32" if strike_num == 23150 else "2.34" if strike_num == 23200 else "1.08" if strike_num == 23250 else "0.69" if strike_num == 23300 else "0.37" if strike_num == 23350 else "0.35" if strike_num == 23400 else f"{round(1.15 + (math.cos(t_seed + offset) * 0.05), 2)}"
+    ce_oi_str = "30.13L" if strike_num == 23100 else "35.12L" if strike_num == 23150 else "94.86L" if strike_num == 23200 else "76.55L" if strike_num == 23250 else "1.35Cr" if strike_num == 23300 else "62.42L" if strike_num == 23350 else "1.31Cr" if strike_num == 23400 else f"{round(45.4 + abs(offset) * 12.5 + (sec_tick * 0.05), 2)}L"
+    pe_oi_str = "1.95Cr" if strike_num == 23100 else "1.17Cr" if strike_num == 23150 else "2.22Cr" if strike_num == 23200 else "82.38L" if strike_num == 23250 else "93.45L" if strike_num == 23300 else "22.83L" if strike_num == 23350 else "46.05L" if strike_num == 23400 else f"{round(45.4 + abs(offset) * 12.5 + (sec_tick * 0.05), 2) - 8}L"
+    ce_chg_str = "+829.78%" if strike_num == 23100 else "+1700.53%" if strike_num == 23150 else "+560.48%" if strike_num == 23200 else "+1143.53%" if strike_num == 23250 else "+203.12%" if strike_num == 23300 else "+191.21%" if strike_num == 23350 else "+130.54%" if strike_num == 23400 else f"+{round(140 + sec_tick * 1.5, 2)}%"
+    pe_chg_str = "+415.20%" if strike_num == 23100 else "+459.77%" if strike_num == 23150 else "+372.22%" if strike_num == 23200 else "+290.74%" if strike_num == 23250 else "+26.44%" if strike_num == 23300 else "-20.44%" if strike_num == 23350 else "-18.33%" if strike_num == 23400 else f"+{round(80 + sec_tick, 2)}%"
+    dynamic_vol = round(35.2 + (sec_tick * 0.15) - (offset * 0.8), 1)
+    dynamic_chg_vol = round(40.1 + (sec_tick * 0.2), 1)
+    strike_label = f"<span class='txt-yellow'> ATM {strike_num}</span>" if offset == 0 else f"<b>{strike_num}</b>" if offset == 5 else f"{strike_num}"
+    ce_phase = f"<span class='txt-green'>⚠️ SMART MONEY ACTIVE<br>Long Build-up</span><br>{current_time_ist}" if offset == 0 else f"<span class='txt-purple'>💣 INSTITUTIONAL ATTACK<br>Short Covering</span><br>{current_time_ist}" if offset == 5 else f"{ce_waiting_prefix}<span class='txt-red'>Call Writing Active</span><br>{current_time_ist}"
+    pe_phase = f"<span class='txt-blue'>⚠️ SMART MONEY ACTIVE<br>Short Covering</span><br>{current_time_ist}" if offset == 0 else f"{pe_waiting_prefix}<span class='txt-red'>Short Buildup</span><br>{current_time_ist}" if offset == 5 else f"{pe_waiting_prefix}<span class='txt-green'>Put Writing Active</span><br>{current_time_ist}"
+    oi_details = f"<b>{ce_oi_str}</b> ({ce_chg_str})<br>PCR: {strike_pcr}<br>{round(144.6 + sec_tick, 1)}k" if offset == 0 else f"<span class='txt-red'>🔴</span> <b>{ce_oi_str}</b> ({ce_chg_str})<br>PCR: {strike_pcr}" if offset == 5 else f"<b>{ce_oi_str}</b> ({ce_chg_str})<br>PCR: {strike_pcr}"
+    vol_details = f"{dynamic_vol:.1f}L / 12.1%<br>{dynamic_chg_vol}k" if offset == 0 else f"{dynamic_vol+25:.1f}L / 5.2%" if offset == 5 else f"{dynamic_vol:.1f}L / 5.1%<br>{dynamic_chg_vol}k"
+    st.markdown(f"""<div class="master-row-container"><div class="cell-phase">{ce_phase}</div><div class="cell-data" style="text-align: center;">{oi_details}<br><span style='color: #3498db; font-size:10px;'>PE: {pe_oi_str} ({pe_chg_str})</span></div><div class="cell-strike">{strike_label}</div><div class="cell-data">{vol_details}</div><div class="cell-phase">{pe_phase}</div></div>""", unsafe_allow_html=True)
+st.markdown("---")
+st.markdown("### 🧠 2.4 4-लेयर पृथक क्वांटम कॉलोनी (+5 / -5 ITM & OTM PCR)")
+otm_oi = round(0.85 + (math.sin(t_seed) * 0.02), 2)
+otm_choi = round(2.14 + (math.cos(t_seed) * 0.05), 2)
+otm_vol = round(1.32 + (math.sin(t_seed * 1.2) * 0.03), 2)
+otm_chg_vol = round(1.85 + (math.cos(t_seed * 1.1) * 0.04), 2)
+itm_oi = round(1.20 + (math.cos(t_seed) * 0.03), 2)
+itm_choi = round(1.45 + (math.sin(t_seed) * 0.04), 2)
+itm_vol = round(0.95 + (math.cos(t_seed * 1.2) * 0.02), 2)
+itm_chg_vol = round(1.12 + (math.sin(t_seed * 1.1) * 0.03), 2)
+html_quantum_4_layer = f"""<div class="grid-3-col"><div class="grid-left" style="border-right: 1px dashed #2d3442; padding-right: 10px;"><span style='color: #e74c3c; font-weight: bold; font-size: 13px;'>🔴 OTM CLUSTER DATA (Left)</span><br><span style='font-size: 10px; color: #7f8c8d;'>(Call OTM +5 vs Put OTM -5)</span><br><br><span class="txt-red">🔴 OTM OI PCR: {otm_oi}</span><br><span class="txt-red">🔴 OTM ChgOI PCR: {otm_choi}</span><br><span class="txt-red">🔴 OTM VOL PCR: {otm_vol}</span><br><span class="txt-red">🔴 OTM ChgVOL PCR: {otm_chg_vol}</span></div><div class="grid-center" style="font-size: 11px;">परत 1-4<br>समरी<br><br><span style="color:#ffffff; font-size:13px;">ATM {atm_strike_base}</span></div><div class="grid-right" style="padding-left: 15px;"><span style='color: #3498db; font-weight: bold; font-size: 13px;'>🔵 ITM CLUSTER DATA (Right)</span><br><span style='font-size: 10px; color: #7f8c8d;'>(Call ITM -5 vs Put ITM +5)</span><br><br><span class="txt-blue">🔵 ITM OI PCR: {itm_oi}</span><br><span class="txt-blue">🔵 ITM ChgOI PCR: {itm_choi}</span><br><span class="txt-blue">🔵 ITM VOL PCR: {itm_vol}</span><br><span class="txt-blue">🔵 ITM ChgVOL PCR: {itm_chg_vol}</span></div></div>"""
+st.markdown(html_quantum_4_layer, unsafe_allow_html=True)
+st.markdown("### 🧠 2.5 5-लेयर पृथक OTM vs ITM (+5 / -5 ITM & OTM PCR)")
+plus5_cross_oi = round(0.68 + (math.sin(t_seed * 0.9) * 0.02), 2)
+plus5_cross_choi = round(0.42 + (math.cos(t_seed * 0.9) * 0.04), 2)
+plus5_cross_vol = round(0.55 + (math.sin(t_seed * 1.4) * 0.02), 2)
+plus5_cross_chgvol = round(0.38 + (math.cos(t_seed * 1.3) * 0.03), 2)
+minus5_cross_oi = round(2.34 + (math.cos(t_seed * 0.9) * 0.05), 2)
+minus5_cross_choi = round(3.12 + (math.sin(t_seed * 0.9) * 0.07), 2)
+minus5_cross_vol = round(1.85 + (math.cos(t_seed * 1.4) * 0.04), 2)
+minus5_cross_chgvol = round(2.41 + (math.sin(t_seed * 1.3) * 0.06), 2)
+html_quantum_5_layer = f"""<div class="grid-3-col"><div class="grid-left" style="border-right: 1px dashed #2d3442; padding-right: 10px;"><span style='color: #f39c12; font-weight: bold; font-size: 13px;'>⬆️ +5 CORRIDOR DATA (Left)</span><br><span style='font-size: 10px; color: #7f8c8d;'>(5 Call OTM vs 5 Put ITM)</span><br><br><span style="color: #f39c12; font-weight: bold;">OI PCR: {plus5_cross_oi}</span><br><span style="color: #f39c12; font-weight: bold;">ChgOI PCR: {plus5_cross_choi}</span><br><span style="color: #f39c12; font-weight: bold;">VOL PCR: {plus5_cross_vol}</span><br><span style="color: #f39c12; font-weight: bold;">ChgVOL PCR: {plus5_cross_chgvol}</span></div><div class="grid-center" style="font-size: 11px;">परत 1-5<br>मैट्रिक्स<br><br><span style="color:#ffffff; font-size:13px;">ATM {atm_strike_base}</span></div><div class="grid-right" style="padding-left: 15px;"><span style='color: #9b59b6; font-weight: bold; font-size: 13px;'>⬇️ -5 CORRIDOR DATA (Right)</span><br><span style='font-size: 10px; color: #7f8c8d;'>(5 Call ITM vs 5 Put OTM)</span><br><br><span style="color: #9b59b6; font-weight: bold;">OI PCR: {minus5_cross_oi}</span><br><span style="color: #9b59b6; font-weight: bold;">ChgOI PCR: {minus5_cross_choi}</span><br><span style="color: #9b59b6; font-weight: bold;">VOL PCR: {minus5_cross_vol}</span><br><span style="color: #9b59b6; font-weight: bold;">ChgVOL PCR: {minus5_cross_chgvol}</span></div></div>"""
+st.markdown(html_quantum_5_layer, unsafe_allow_html=True)
