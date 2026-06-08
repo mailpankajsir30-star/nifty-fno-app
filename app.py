@@ -353,40 +353,4 @@ with col_rev2:
         <span style='font-size: 11px; color: #a3b8cc;'>लॉजिक: Min(50C Swing High, PDH) = {calc_resistance_ceiling} | मैक्सिमम कॉल ओआई बैरियर दीवार (Gamma Wall ब्लास्ट स्तर)</span>
     </div>
     """, unsafe_allow_html=True)
-# =======================================================================
-# QUANT-MASTER V3 BACKGROUND TIMING TRIGGER (AUTO 1-SECOND INJECTOR)
-# =======================================================================
-import streamlit.components.v1 as components
 
-# Browser side javascript background execution for freeze-free live ticks
-components.html(
-    """
-    <script>
-    const intervalPeriod = 1000; // Exact 1000 Milliseconds = 1 Second
-    
-    function forceTerminalTick() {
-        // Streamlit cloud context me window elements ko update aur rerun trigger karne ka pipeline
-        const parentWindow = window.parent;
-        if (parentWindow) {
-            // Screen refresh block checking aur layout reload request dispatching
-            const reloadBtn = parentWindow.document.querySelector('button[kind="header"]');
-            if (reloadBtn) {
-                reloadBtn.click();
-            } else {
-                // Alternately hooks direct page element state modifiers ko force reload request bhejte hain
-                parentWindow.location.reload();
-            }
-        }
-    }
-    
-    // Auto loop continuous execution registry logic
-    if (!window.quantMasterIntervalSet) {
-        window.quantMasterIntervalSet = true;
-        setInterval(forceTerminalTick, intervalPeriod);
-        console.log("QUANT-MASTER v3 Master Terminal Auto-1s Engine Injected Successfully!");
-    }
-    </script>
-    """,
-    height=0,
-    width=0
-)
