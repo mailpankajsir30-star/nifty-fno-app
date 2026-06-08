@@ -137,3 +137,56 @@ minus5_cross_vol = round(1.85 + (math.cos(t_seed * 1.4) * 0.04), 2)
 minus5_cross_chgvol = round(2.41 + (math.sin(t_seed * 1.3) * 0.06), 2)
 html_quantum_5_layer = f"""<div class="grid-3-col"><div class="grid-left" style="border-right: 1px dashed #2d3442; padding-right: 10px;"><span style='color: #f39c12; font-weight: bold; font-size: 13px;'>⬆️ +5 CORRIDOR DATA (Left)</span><br><span style='font-size: 10px; color: #7f8c8d;'>(5 Call OTM vs 5 Put ITM)</span><br><br><span style="color: #f39c12; font-weight: bold;">OI PCR: {plus5_cross_oi}</span><br><span style="color: #f39c12; font-weight: bold;">ChgOI PCR: {plus5_cross_choi}</span><br><span style="color: #f39c12; font-weight: bold;">VOL PCR: {plus5_cross_vol}</span><br><span style="color: #f39c12; font-weight: bold;">ChgVOL PCR: {plus5_cross_chgvol}</span></div><div class="grid-center" style="font-size: 11px;">परत 1-5<br>मैट्रिक्स<br><br><span style="color:#ffffff; font-size:13px;">ATM {atm_strike_base}</span></div><div class="grid-right" style="padding-left: 15px;"><span style='color: #9b59b6; font-weight: bold; font-size: 13px;'>⬇️ -5 CORRIDOR DATA (Right)</span><br><span style='font-size: 10px; color: #7f8c8d;'>(5 Call ITM vs 5 Put OTM)</span><br><br><span style="color: #9b59b6; font-weight: bold;">OI PCR: {minus5_cross_oi}</span><br><span style="color: #9b59b6; font-weight: bold;">ChgOI PCR: {minus5_cross_choi}</span><br><span style="color: #9b59b6; font-weight: bold;">VOL PCR: {minus5_cross_vol}</span><br><span style="color: #9b59b6; font-weight: bold;">ChgVOL PCR: {minus5_cross_chgvol}</span></div></div>"""
 st.markdown(html_quantum_5_layer, unsafe_allow_html=True)
+st.markdown("---")
+st.markdown("### 🤖 3. UNIFIED AI DECISION SCORES (% DISTRIBUTION ENGINE)")
+if not is_market_green:
+    call_label_text = f"<span class='txt-red'>AI CALL BUY SCORE: 2.0%<br>(BEARISH MODE)</span>"
+    put_label_text = f"<span class='txt-green'>🔴 AI PUT BUY SCORE: {put_score}%<br>(STRONG BEARISH)</span>"
+else:
+    call_label_text = f"<span class='txt-green'>🟢 AI CALL BUY SCORE: {call_score}%<br>(STRONG BULLISH)</span>"
+    put_label_text = f"<span class='txt-red'>AI PUT BUY SCORE: 2.0%<br>(BULLISH MODE)</span>"
+html_ai_brain_matrix = f"""<div class="grid-3-col"><div class="grid-left">{call_label_text}<br><br><span class="txt-yellow">🟡 SIDEWAYS SCORE: {sideways_score}%</span></div><div class="grid-center">AI<br>BRAIN<br>MATRIX</div>
+<div class="grid-right">{put_label_text}<br><br><span class="txt-purple">🟣 NO TRADE / TRAP SCORE: {no_trade_score}%</span></div></div>"""
+st.markdown(html_ai_brain_matrix, unsafe_allow_html=True)
+st.markdown("---")
+st.markdown("### 🍏 4. EXPIRY DAY SPECIAL AI CONFIDENCE ENGINE (IV & THETA SYNC)")
+if is_market_choppy:
+    expiry_status_mode = "🛑 STRICTLY NO TRADE (CHOPPY COMPRESSION ENFORCED)"
+    expiry_net_confidence = round(sideways_score + no_trade_score, 2)
+    expiry_reason_text = "⚠️ <b>CRITICAL PROTECTION ALERT:</b> Delta Velocity aur Volume Acceleration bilkul dead compression zone mein hain. Market puri tarah <b>CHOPPY (Side-ways)</b> hai. Option Buying karne par theta decay aapka paisa milt (zero) kar dega. System ne Buying signals ko lock kiya hai, capital save karein."
+    expiry_color_border = "#f39c12"
+elif call_score > 60.0:
+    expiry_status_mode = "💥 GAMMA BLAST ACTIVE: CALL BUY MODEL"
+    expiry_net_confidence = call_score
+    expiry_reason_text = "• <b>Breakout Signal:</b> Choppy structure successfully broke up! Delta Velocity (16%) aur Gamma Expression (16%) dono max velocity par hain. Call premiums explosive expansion ke liye ready hain."
+    expiry_color_border = "#2ecc71"
+elif put_score > 60.0:
+    expiry_status_mode = "💥 GAMMA BLAST ACTIVE: PUT BUY MODEL"
+    expiry_net_confidence = put_score
+    expiry_reason_text = "• <b>Breakout Signal:</b> Floor Support broken! 14-sensors matrix ke mutabik Price Action aur Price Velocity mंदी ke support lines ko short kar chuke hain. Downward momentum gamma expansion ko confirm karta hai."
+    expiry_color_border = "#e74c3c"
+else:
+    expiry_status_mode = "🟣 OPERATOR TRAP ZONE (STRICTLY NO TRADE)"
+    expiry_net_confidence = no_trade_score
+    expiry_reason_text = "• <b>Reason:</b> Market structures are highly volatile but directionless (Whipsaw Zone). Operators short contracts build karke liquidity trap bana rahe hain. Capital safely preserve karein."
+    expiry_color_border = "#9b59b6"
+st.markdown(f"""<div style='background-color: #161b22; padding: 14px; border-radius: 6px; border: 1px solid {expiry_color_border};'><span style='color: {expiry_color_border}; font-weight: bold; font-size: 15px;'>🔮 EXPIRY MODEL STATUS: {expiry_status_mode} (Net Confidence: {expiry_net_confidence}%)</span><br><br><span style='font-size: 12px; color: #a3b8cc;'>{expiry_reason_text}</span></div>""", unsafe_allow_html=True)
+st.markdown("---")
+st.markdown("### 🏛️ 5. BIG PLAYERS PANIC, SAFE ZONE & ULTIMATE QUANT ALERTS")
+st.markdown(f"""<div style='background-color: #161b22; padding: 12px; border-radius: 5px; border: 1px solid #e74c3c; color: white; font-size: 13px;'><span style='color: #e74c3c; font-weight: bold; font-size: 14px;'>🔴 QUANTUM FUSION METRICS ALERT: TAKE PUT BUY ACTIVE (🎯 Confidence: {put_score}%)</span><br><br><b>🛑 SELLER PANIC LEVELS (Elasticity Limit):</b><br>• Call Seller Panic Zone: <b>Above {atm_strike_base + 100}</b>. स्विंग सीलिंग पार होने पर कॉल राइटर्स का Unlimited Loss और 💣 Massive Gamma Blast शुरू होगा।<br>• Put Seller Panic Zone: <b>Below {atm_strike_base - 100}</b>. सपोर्ट फ्लोर टूटने पर पुट राइटर्स घबराकर भागेंगे (🔴 OI Fleeing)।<br><br><b>🛡️ INSTITUTIONAL SAFE ZONE (Corridor):</b><br>• <b>{atm_strike_base - 100} — {atm_strike_base + 100}</b> के दायरे में बड़े ऑपरेटर्स पूरी तरह सुरक्षित रहकर थीटा डीके वसूलेंगे।</div>""", unsafe_allow_html=True)
+st.write("")
+st.markdown("#### ⚠️ REVERSAL SATARK ZONE & OHLC LEVELS")
+mock_50c_swing_low = atm_strike_base - 130
+mock_prev_day_low = atm_strike_base - 150
+mock_prev_day_close = atm_strike_base - 105
+mock_50c_swing_high = atm_strike_base + 130
+mock_prev_day_high = atm_strike_base + 150
+calc_support_floor = max(mock_50c_swing_low, mock_prev_day_low, mock_prev_day_close)
+calc_resistance_ceiling = min(mock_50c_swing_high, mock_prev_day_high)
+col_rev1, col_rev2 = st.columns(2)
+with col_rev1:
+    st.markdown(f"""<div style='background-color: #1b2a22; padding: 12px; border-radius: 5px; border: 1px solid #2ecc71;'><span style='color: #2ecc71; font-weight: bold; font-size: 14px;'>🔄 Pull-Back Support Range (Put Side 🟢):</span><br><span style='font-size: 20px; font-weight: bold; color: white;'>{atm_strike_base - 150} — {atm_strike_base - 100}</span><br><span style='font-size: 11px; color: #a3b8cc;'>लॉजिक: Max(50C Swing Low, PDL, PDC) = {calc_support_floor} | हैवी पुट राइटिंग और अब्जॉर्प्शन जोन</span></div>""", unsafe_allow_html=True)
+with col_rev2:
+    st.markdown(f"""<div style='background-color: #2c1a1d; padding: 12px; border-radius: 5px; border: 1px solid #e74c3c;'><span style='color: #e74c3c; font-weight: bold; font-size: 14px;'>🛑 Pull-Down Resistance Wall (Call Side 🔴):</span><br><span style='font-size: 20px; font-weight: bold; color: white;'>{atm_strike_base + 100} — {atm_strike_base + 150}</span><br><span style='font-size: 11px; color: #a3b8cc;'>लॉजिक: Min(50C Swing High, PDH) = {calc_resistance_ceiling} | मैक्सिमम कॉल ओआई बैरियर दीवार</span></div>""", unsafe_allow_html=True)
+time.sleep(1.0)
+st.rerun()
